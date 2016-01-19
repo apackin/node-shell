@@ -18,25 +18,39 @@ var commands = {
 		});
 	},
 
-	findInFile: function(stdin, args, done){
+	find: function(stdin, args, done){
 		var self = this;
 		var dirFind = args[0];
 		var matches = [];
+		var contents = "";
 
 		var findFiles = function(dirFind){
-			// console.log(dirFind);
 			fs.readdir(dirFind, function(err, files) {
 				if (err) throw err;
 				files.forEach(function(file){
 					matches.push(dirFind + "/" + file);
-					if (fs.lstatSync(dirFind + "/" + file).isDirectory()) {
-						matches.push(findFiles(dirFind + "/" + file));
-					}
 				});
-				console.log(matches);
-				// logs undefined files as well so need to get rid of those before done();
+				next();
 			});
 		};
+
+		var next = function(){
+			if(matches.length){
+				match = matches.shift();
+				contents += match + "\n";
+				if (fs.lstatSync(match).isDirectory()) {
+					findFiles(match);
+				} else {
+					next();
+				}
+
+			} else {
+				done(stdin, contents);
+			}
+
+		};
+
+
 		findFiles(dirFind);
 		done(stdin, matches.join("\n"));
 	},
@@ -50,12 +64,14 @@ var commands = {
 	},
 
 	head: function(stdin, args, done) {
-		var option = (Number(args[1])>0) ? args[1] : 5;
+		// var option = (Number(args[1])>0) ? args[1] : 5;
+		var option = 5;
 		this.readFile(stdin, done, args, 0, option);
 	},
 
 	tail: function(stdin, args, done) {
-		var option = (Number(args[1])>0) ? -args[1] : -5;
+		// var option = (Number(args[1])>0) ? -args[1] : -5;
+		var option = -5;
 		this.readFile(stdin, done, args, option, undefined);
 	},
 

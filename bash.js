@@ -17,8 +17,8 @@ process.stdin.on('data', function(data) {
   	
   	// the first time i need to do normal, then use an answer.
 
-  	if(commands.hasOwnProperty(cmd)) commands[cmd.toLowerCase()](stdin, file, done);
-  	else done("This is not a valid command");
+  	if(commands[cmd]) commands[cmd.toLowerCase()](stdin, file, done);
+  	else done(stdin, "This is not a valid command: " + cmd);
 
 	// switch(cmd.toLowerCase()) {
 	//   	case "date": commands.date(stdin, file, done); break;
