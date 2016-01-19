@@ -3,12 +3,12 @@ var request = require("request");
 
 var commands = {
 	date : function(stdin, f, done) { 
-		var today = new Date();
-		done(stdin, today.toString());
+		var today = new Date().toString();
+		done(stdin, today);
 	},
 
 	pwd : function(stdin, f, done) {
-		done(stdin, process.env.PWD);
+		done(stdin, process.env.PWD); // process.cwd();
 	},
 
 	ls : function(stdin, f, done) {
@@ -60,12 +60,16 @@ var commands = {
 	},
 
 	readFile: function(stdin, done, args, option1, option2){
-		
-		var file = args[0];
-		fs.readFile("./"+file, 'utf8', function(err, files) {
-		  if (err) throw err;
-		  done(stdin, files.split("\n").slice(option1, option2).join("\n"));
-		});
+		if(typeof args==="string"){
+			var newFile = args.split("\n").slice(option1, option2).join("\n");
+			done(stdin, newFile);
+		} else {
+			var file = args[0];
+			fs.readFile("./"+file, 'utf8', function(err, files) {
+			  if (err) throw err;
+			  done(stdin, files.split("\n").slice(option1, option2).join("\n"));
+			});
+		}
 	},
 
 	curl: function(stdin, args, done) {
